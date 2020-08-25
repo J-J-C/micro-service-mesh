@@ -1,0 +1,7 @@
+server:
+  port: 8090
+spring:
+  application:
+    name: user-service
+utility-service:
+  url: "http://utility-service-sidecar:10000"

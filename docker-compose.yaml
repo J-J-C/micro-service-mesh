@@ -1,0 +1,39 @@
+version: "3.8"
+services:
+  utility-service-sidecar:
+    image: envoyproxy/envoy:v1.16-latest
+    ports:
+      - "10000:10000" # socket port
+      - "9901:9901" # admin address
+    networks:
+      - envoy-tryout
+    volumes:
+      - ./utility-service/envoy:/etc/envoy
+  utility-service:
+    build: ./utility-service/flask
+    ports:
+      - "5000:5000"
+    networks:
+      - envoy-tryout
+    volumes:
+      - ./utility-service/flask:/app
+  user-service-sidecar:
+    image: envoyproxy/envoy:v1.16-latest
+    ports:
+      - "10001:10001" # socket port
+      - "9902:9902" # admin address
+    networks:
+      - envoy-tryout
+    volumes:
+      - ./user-service/envoy:/etc/envoy
+
+  user-service:
+    build:
+      context: ./user-service
+    networks:
+      - envoy-tryout
+    volumes:
+      - ./user-service/target/user-service-1.0.0-SNAPSHOT.jar:/app.jar
+networks:
+  envoy-tryout:
+    driver: bridge

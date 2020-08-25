@@ -1,0 +1,39 @@
+version: "3.8"
+services:
+  front-proxy:
+    image: envoyproxy/envoy:v1.16-latest
+    networks:
+      - envoy-tryout
+    ports:
+    - "9999:9999"
+    volumes:
+      - ./front-envoy:/etc/envoy
+  utility-service-sidecar:
+    image: envoyproxy/envoy:v1.16-latest
+    networks:
+      - envoy-tryout
+    volumes:
+      - ./utility-service/envoy:/etc/envoy
+  utility-service:
+    build: ./utility-service/flask
+    networks:
+      - envoy-tryout
+    volumes:
+      - ./utility-service/flask:/app
+  user-service-sidecar:
+    image: envoyproxy/envoy:v1.16-latest
+    networks:
+      - envoy-tryout
+    volumes:
+      - ./user-service/envoy:/etc/envoy
+
+  user-service:
+    build:
+      context: ./user-service
+    networks:
+      - envoy-tryout
+    volumes:
+      - ./user-service/target/user-service-1.0.0-SNAPSHOT.jar:/app.jar
+networks:
+  envoy-tryout:
+    driver: bridge
